@@ -1,6 +1,4 @@
-%   Biometric Systems
-%   CYS616
-%   CONVOLUTIONAL NEURAL NETWORK FOR IRIS RECOGNITION
+
 clc;    % Clear the command window.
 close all;  % Close all figures (except those of imtool.)
 clear;  % Erase all existing variables. Or clearvars if you want.
@@ -37,17 +35,13 @@ categories = {
     imdsTrain = imageDatastore(fullfile(pwd,'Dataset/TrainData', categories),'IncludeSubfolders',true,'FileExtensions','.bmp','LabelSource','foldernames');
 num_train = size(imdsTrain.Files,1);
 
-%% Size of first image in dataset
     img = readimage(imdsTrain,1);
     [x , y , z] = size(img);
 
-%% Load Test Data
     imdsValidation = imageDatastore(fullfile(pwd,'Dataset/TestData', categories),'IncludeSubfolders',true,'FileExtensions','.bmp','LabelSource','foldernames');
 num_test = size(imdsValidation.Files,1);
-%% Calculate the number of images in each category. 
     labelCount = countEachLabel(imdsTrain);
 
-    %% Define Network Architecture
     layers = [
  
     imageInputLayer([x y z]);  
@@ -81,7 +75,6 @@ num_test = size(imdsValidation.Files,1);
     softmaxLayer
     classificationLayer];
  
-    %% Specify Training Options
     options = trainingOptions('sgdm', ...
     'InitialLearnRate', 0.001, ...
     'ValidationData',imdsValidation, ...
@@ -95,26 +88,25 @@ num_test = size(imdsValidation.Files,1);
     'ExecutionEnvironment','gpu', ...
     'Verbose', true, 'VerboseFrequency', 10);
 
-%% Train Network Using Training Data
+
     [net_Wael, info] = trainNetwork(imdsTrain,layers,options);
 save('TrainedNetwork.mat','net_Wael')
 movefile('TrainedNetwork.mat','results')
 
 
-    %% Classify validation
+
     labels = classify(net_Wael,imdsValidation);
     C = confusionmat(imdsValidation.Labels,labels);
     confusion_chart = confusionchart(imdsValidation.Labels,labels);
     drawnow;
-    %% Compute Accuracy
+
     YValidation = imdsValidation.Labels;
     accuracy02 = sum(labels == YValidation)/numel(YValidation)*100;
     dis=['The final accuracy rate is: ', num2str(accuracy02,'%2.2f'), '%'];
     disp(dis);
 diary off
-%%  move diary file
 movefile('Progress.txt','results')
-        %% *Test one at a time*
+       
 true=0;
 false=0;
     for i = 1:size(imdsValidation.Files,1)
@@ -125,7 +117,6 @@ false=0;
             end
     end
 
-    %% Find the square root of the false matches to determine the subplots
 
     f0=floor(sqrt(false));
     if f0 == sqrt(false)
@@ -134,11 +125,11 @@ false=0;
         f1=f0+1;
     end
 
-   %% Recalbirating true and false
+   
     true=0;
     false=0;
 
-  %%  start plotting mismatches
+
     falsefig = figure('Name','All Mismatch Pictures','Visible','off','Units', 'Normalized', 'OuterPosition', [0, 0.04, 1, 0.96]);
 
     for i = 1:size(imdsValidation.Files,1)
@@ -161,7 +152,7 @@ false=0;
     xlabel('ALL mismatch incidents');
     saveas(falsefig,'All Mismatches.png');
     movefile('All Mismatches.png','results');
- %%   start plotting sample of correct match
+ 
     truefig = figure('Name','Sample of Correct Match','Visible','off','Units', 'Normalized', 'OuterPosition', [0, 0.04, 1, 0.96]);
     
     true=0;
